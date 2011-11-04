@@ -52,7 +52,7 @@ function anonymous(_output_, _encode_, helper) {
 	
 var AceTemplate = AceTemplate || {};
 
-(function(exports){
+void function(exports){
 	/**
 	 * Ace Engine Template
 	 * 一套基于HTML和JS语法自由穿插的模板系统
@@ -161,6 +161,9 @@ var AceTemplate = AceTemplate || {};
 		var body = [], processItem = [];
 		body.push("with(this){");
 		body.push(template
+			.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, function(all) {
+				return ['!#{decodeURIComponent("', encodeURIComponent(all), '")}'].join('');
+			})
 			.replace(/[\r\n]+/g, "\n") // 去掉多余的换行，并且去掉IE中困扰人的\r
 			.replace(/^\n+|\s+$/mg, "") // 去掉空行，首部空行，尾部空白
 			.replace(/((^\s*[<>!#^&\u0000-\u0008\u007F-\uffff].*$|^.*[<>]\s*$|^(?!\s*(else|do|try|finally)\s*$)[^'":;{}()]+$|^(\s*(([\w-]+\s*=\s*"[^"]*")|([\w-]+\s*=\s*'[^']*')))+\s*$|^\s*([.#][\w-.]+(:\w+)?(\s*|,))*(?!(else|do|while|try|return)\b)[.#]?[\w-.*]+(:\w+)?\s*\{.*$)\s?)+/mg, function(expression) { // 输出原文
@@ -256,4 +259,4 @@ var AceTemplate = AceTemplate || {};
 	exports.unregister = function(id){
 		delete readerCaches[id];
 	};
-})(AceTemplate);
+}(AceTemplate);

@@ -90,6 +90,13 @@
 					{
 						input: ["t4", {}],
 						output: "			N / A\n			A, B, C\n			12.34"
+					},
+					{
+						input: ["#{title}\n<\script>String.prototype.trim = function() {}<\/script>\n#{value}<\style type=\"text/css\">body{background:none;}<\/style>", {
+							title: 'script',
+							value: 'style'
+						}],
+						output: "script\n<\script>String.prototype.trim = function() {}<\/script>\nstyle<\style type=\"text/css\">body{background:none;}<\/style>"
 					}
 				];
 				
