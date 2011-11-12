@@ -50,7 +50,7 @@ function anonymous(_output_, _encode_, helper) {
 }
 */
 	
-var AceTemplate = AceTemplate || {};
+var AceTemplate = typeof exports != 'undefined' ? exports : AceTemplate || {};
 
 void function(exports){
 	/**
