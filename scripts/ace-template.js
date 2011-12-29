@@ -49,15 +49,15 @@ function anonymous(_output_, _encode_, helper) {
 	}
 }
 */
-	
-var AceTemplate = typeof exports != 'undefined' ? exports : AceTemplate || {};
+
+var AceTemplate = /^u/.test(typeof exports) ? AceTemplate || {} : exports;
 
 void function(exports){
 	/**
 	 * Ace Engine Template
 	 * 一套基于HTML和JS语法自由穿插的模板系统
 	 * @see http://code.google.com/p/ace-engine/wiki/AceTemplate
-	 * @author 王集鹄(wangjihu，http://weibo.com/zswang) 鲁亚然(luyaran，http://weibo.com/zinkey)
+	 * @author 王集鹄(wangjihu,http://weibo.com/zswang) 鲁亚然(luyaran,http://weibo.com/zinkey)
 	 * @version 2011-07-06 
  	 * @copyright (c) 2011, Baidu Inc, All rights reserved.
 	 */
@@ -155,6 +155,9 @@ void function(exports){
 	 * 	样式表达式
 	 * 		示例：div.focus{color: #fff;}、#btnAdd span{}
 	 * 		正则：/^\s*([.#][\w-.]+(:\w+)?(\s*|,))*(?!(else|do|while|try|return)\b)[.#]?[\w-.*]+(:\w+)?\s*\{.*$/mg
+	 * 	非字符串内容且明显不是JS
+	 * 		示例：http://www.baidu.com、name:(#{name})、email:xxx@baidu.com
+	 * 		正则：/^[^"'\n]*(:\/\/|#\{|@).*$/mg
 	 * @param {String} template 模板字符
 	 */
 	function analyse(template) {
@@ -166,7 +169,7 @@ void function(exports){
 			})
 			.replace(/[\r\n]+/g, "\n") // 去掉多余的换行，并且去掉IE中困扰人的\r
 			.replace(/^\n+|\s+$/mg, "") // 去掉空行，首部空行，尾部空白
-			.replace(/((^\s*[<>!#^&\u0000-\u0008\u007F-\uffff].*$|^.*[<>]\s*$|^(?!\s*(else|do|try|finally)\s*$)[^'":;{}()]+$|^(\s*(([\w-]+\s*=\s*"[^"]*")|([\w-]+\s*=\s*'[^']*')))+\s*$|^\s*([.#][\w-.]+(:\w+)?(\s*|,))*(?!(else|do|while|try|return)\b)[.#]?[\w-.*]+(:\w+)?\s*\{.*$)\s?)+/mg, function(expression) { // 输出原文
+			.replace(/((^\s*[<>!#^&\u0000-\u0008\u007F-\uffff].*$|^.*[<>]\s*$|^(?!\s*(else|do|try|finally)\s*$)[^'":;{}()]+$|^(\s*(([\w-]+\s*=\s*"[^"]*")|([\w-]+\s*=\s*'[^']*')))+\s*$|^\s*([.#][\w-.]+(:\w+)?(\s*|,))*(?!(else|do|while|try|return)\b)[.#]?[\w-.*]+(:\w+)?\s*\{.*$|^[^"'\n]*(:\/\/|#\{|@).*$)\s?)+/mg, function(expression) { // 输出原文
 				expression = ['"', expression
 					.replace(/&none;/g, "") // 空字符
 					.replace(/["'\\]/g, "\\$&") // 处理转义符
@@ -218,7 +221,7 @@ void function(exports){
 			}
 		}
 		var output = [];
-		reader.call(data || "", output, lib.encodeHTML, helper);
+		reader.call(/^u/.test(typeof data) ? "" : data, output, lib.encodeHTML, helper);
 		return output.join("");
 	};
 	
