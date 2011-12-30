@@ -6,8 +6,9 @@
 	<canvas id="canvas3" width="1000" height="1000"></canvas>
 	<script>
 		var data = [];
-		for (var i = 0; i < 10000; i++){
-			data.push([~~(Math.random() * 10000), ~~(Math.random() * 10000), ~~(Math.random() * 10000)]);
+		var count = 10000;
+		for (var i = 0; i < count; i++){
+			data.push([~~(Math.random() * count), ~~(Math.random() * count), ~~(Math.random() * count)]);
 		}
 
 		function bind(canvas){
@@ -25,6 +26,6 @@
 			}
 		}
 		bind(document.getElementById('canvas2'));
-		bind(document.getElementById('canvas3'));
+		//bind(document.getElementById('canvas3'));
 	</script>
 </body>

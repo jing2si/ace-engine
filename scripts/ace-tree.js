@@ -5,7 +5,7 @@ void function(exports){
 	 * Ace Engine Tree
 	 * 一套基于模板和事件代理的通用树形控件
 	 * @see http://code.google.com/p/ace-engine/wiki/AceTree
-	 * @author 王集鹄(wangjihu，http://weibo.com/zswang)
+	 * @author 王集鹄(wangjihu,http://weibo.com/zswang)
 	 * @version 1.0
 	 * @copyright www.baidu.com
 	 */
@@ -41,9 +41,15 @@ void function(exports){
 			if (!element) return;
 			element.parentNode.removeChild(element);
 		},
+		/*
+		 * 增加class
+		 */
 		addClass: function(element, className){
 			addAttr(element, "class", className);
 		},
+		/*
+		 * 移除class
+		 */
 		removeClass: function(element, className){
 			removeAttr(element, "class", className);
 		},
@@ -57,16 +63,6 @@ void function(exports){
 			for (var i = 0; i < source.length; i++) {
 				if (iterator(source[i], i) === false) break;
 			}
-		},
-		/**
-		 * 获得对象的键值列表，测试用
-		 */
-		getKeys: function(obj){
-			var result = [];
-			for (var p in obj) {
-				result.push(p);
-			}
-			return result;
 		}
 	};
 	
@@ -109,10 +105,7 @@ void function(exports){
 	 */
 	function appendWith(element, html){
 		element = lib.g(element);
-		console.log("1");
 		if (!element) return;
-		console.log("2");
-		console.log(html);
 		element.appendChild(html2Fragment(html));
 	}
 	
@@ -225,11 +218,29 @@ void function(exports){
 	 * @param {Object} data 数据
 	 */
 	function TemplateNode(parentNode, data){
+		/*
+		 * 父节点
+		 */
 		this.parentNode = parentNode;
+		/*
+		 * 所在tree
+		 */
 		this.tree = parentNode.tree;
-		this.layer = parentNode.layer + 1; // 层次
+		/*
+		 * 层级
+		 */
+		this.layer = parentNode.layer + 1;
+		/*
+		 * id
+		 */
 		this.id = data[this.tree.fieldIdentifier];
+		/*
+		 * DOM id
+		 */
 		this.did = [this.tree.didPrefix, this.tree.handler, this.id].join("-");
+		/*
+		 * Childs DOM id
+		 */
 		this.cid = [this.tree.didPrefix, this.tree.handler, this.id, "childs"].join("-");
 		nodeDict[this.did] = this;
 		this.data = data;
@@ -429,6 +440,7 @@ void function(exports){
 		});
 		return returnValue;
 	};
+
 	
 	/**
 	 * 改变状态值，同时渲染dom节点
@@ -442,19 +454,12 @@ void function(exports){
 		if (this.status[name] == value) return;
 		this.status[name] = value;
 		if (pending) return;
-		if (this.tree.statusClasses.test(name)) {
-			if (value) {
-				lib.addClass(this.did, name);
-				this.tree.childsClasses.test(name) && lib.addClass(this.cid, name);
-			} else {
-				lib.removeClass(this.did, name);
-				this.tree.childsClasses.test(name) && lib.removeClass(this.cid, name);
-			}
-		} else {
-			this.refresh();
-		}
+		this.refresh();
 	};
 	
+	/*
+	 * 获取状态值
+	 */
 	TemplateNode.prototype.getStatus = function(name){
 		return this.status[name];
 	};
@@ -522,6 +527,20 @@ void function(exports){
 	 */
 	TemplateNode.prototype.focus = function(scroll){
 		this.tree.setFocused(this, scroll);
+	};
+	
+	/**
+	 * 获得节点对应dom对象
+	 */
+	TemplateNode.prototype.element = function(){
+		return lib.g(this.did);
+	};
+
+	/**
+	 * 获得子节点对应dom对象
+	 */
+	TemplateNode.prototype.childsElement = function(){
+		return lib.g(this.cid);
 	};
 	
 	/**
@@ -662,7 +681,7 @@ void function(exports){
 	};
 	
 	/**
-	 * 移除子节点
+	 * 设置焦点节点
 	 * @param {Object|String|TemplateNode} data 数据或者是ID字符串
 	 * @param {Integer} scroll 0 -- 不滚动 1 -- 靠上滚动 2 -- 靠下滚动
 	 */
@@ -672,7 +691,7 @@ void function(exports){
 		if (!node || node.did == this.focusDid) return;
 		var focused = nodeDict[this.focusDid];
 		focused && focused.setStatus("focus", false);
-		node && node.setStatus("focus", true);
+		node.setStatus("focus", true);
 		if (scroll) {
 			var dom = lib.g(node.did);
 			dom && dom.scrollIntoView(scroll == 1);
@@ -705,7 +724,7 @@ void function(exports){
 	 * @return {TemplateNode} 返回对象的模板节点对象，如果没有找到则返回undefined
 	 */
 	TemplateTree.prototype.node4target = function(target){
-		var node = AceTree.node4target(target);
+		var node = node4target(target);
 		if (!node || node.tree != this) return;
 		return node;
 	};
@@ -748,13 +767,12 @@ void function(exports){
 	exports.create = function(options){
 		return new TemplateTree(options);
 	};
-	
 	/**
 	 * 通过Dom对象获取节点
 	 * @param {String|Element} target Dom节点或者它的id
 	 * @return {TemplateNode} 返回对象的模板节点对象，如果没有找到则返回undefined
 	 */
-	exports.node4target = function(target){
+	function node4target(target){
 		var result;
 		target = lib.g(target);
 		scanParent(target, function(element){
@@ -765,5 +783,7 @@ void function(exports){
 			}
 		});
 		return result;
-	};
+	}
+
+	exports.node4target = node4target;
 }(AceTree);
