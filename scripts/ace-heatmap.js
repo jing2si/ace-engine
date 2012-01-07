@@ -47,10 +47,10 @@ void function(exports){
 			 */
 			_staticMax = options.staticMax || 0,
 			_max = options.max || 1, 
-			_opacity = options.opacity || 180,
-			_radiusIn = options.radiusIn || 3,
-			_radiusOut = options.radiusOut || 15,
-			_origin = options.origin || [0, 0],
+			_papercut = options.papercut || 0,
+			_radiusIn = options.radiusIn || 15,
+			_radiusOut = options.radiusOut || 40,
+			_origin = options.origin || [0, 0, 0],
 			_canvasMap = options.canvas,
 			_width = _canvasMap.width,
 			_height = _canvasMap.height,
@@ -60,7 +60,7 @@ void function(exports){
 			_palette = colorPalette(options.gradient);
 		_canvasAlpha.width = _width;
 		_canvasAlpha.height = _height;
-		document.body.appendChild(_canvasAlpha);
+		//document.body.appendChild(_canvasAlpha);
 		/*
 		 * 对指定区域进行alpha着色
 		 * @param{Number} x
@@ -76,15 +76,18 @@ void function(exports){
 			var image = _contextAlpha.getImageData(x, y, width, height),
 				imageData = image.data,
 				length = imageData.length;
-				
 			for(var i = 3; i < length; i+=4){
-				var alpha = imageData[i],
-				offset = alpha * 4;
-				if (!offset) continue;
-				imageData[i - 3] = _palette[offset];
-				imageData[i - 2] = _palette[offset + 1];
-				imageData[i - 1] = _palette[offset + 2];
-				imageData[i] = alpha < _opacity ? alpha : _opacity;
+				var alpha = imageData[i];
+				if (_papercut){
+					imageData[i - 3] = imageData[i - 2] = imageData[i - 1] = 0;
+					imageData[i] = 255 - alpha;
+				} else if (alpha) {
+					var offset = alpha * 4;
+					imageData[i - 3] = _palette[offset];
+					imageData[i - 2] = _palette[offset + 1];
+					imageData[i - 1] = _palette[offset + 2];
+					imageData[i] = alpha;
+				}
 			}
 
 			image.data = imageData;
@@ -139,8 +142,8 @@ void function(exports){
 			_contextMap.clearRect(0, 0, _width, _height);
 			for (var p in _points){
 				var item = _points[p];
-				var x = item.x + _origin[0],
-					y = item.y + _origin[1];
+				var x = item.x - _origin[0],
+					y = item.y - _origin[1];
 				xb = x - _radiusOut, yb = y - _radiusOut, mul = 2 * _radiusOut;
 				if (xb + mul < 0 || yb + mul < 0) continue;
 				if (xb > _width || yb > _height) continue;
@@ -179,25 +182,35 @@ void function(exports){
 				total = data[2] || data.total || data.count || 0,
 				oldMax = _max;
 			if (inOrigin){
-				x -= _origin[0];
-				y -= _origin[1];
+				x += _origin[0];
+				y += _origin[1];
 			}
 			_addPoint(x, y, total);
 			if (_staticMax || oldMax == _max){
-				x += _origin[0];
-				y += _origin[1];
+				x -= _origin[0];
+				y -= _origin[1];
 				drawAlpha(x, y, total / (_staticMax || _max));
 				colorize(x - _radiusOut, y - _radiusOut, _radiusOut * 2, _radiusOut * 2);
 			} else {
 				_draw();
 			}
 		}
+		function _setPapercut(value){
+			if (!value == !_papercut) return;
+			_papercut = value;
+			_draw();
+		}
+		function _getCanvas(){
+			return _canvasMap;
+		}
 		return {
 			setData: _setData,
 			setOrigin: _setOrigin,
 			getOrigin: _getOrigin,
 			moveOrigin: _moveOrigin,
+			setPapercut: _setPapercut,
 			add: _add,
+			getCanvas: _getCanvas,
 			clear: _clear,
 			draw: _draw,
 			free: _free

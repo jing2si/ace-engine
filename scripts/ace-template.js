@@ -161,7 +161,7 @@ void function(exports){
 	 * @param {String} template 模板字符
 	 */
 	function analyse(template) {
-		var body = [], processItem = [];
+		var body = [];
 		body.push("with(this){");
 		body.push(template
 			.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, function(all) {
@@ -183,7 +183,7 @@ void function(exports){
 							(flag == "#" ? '_encode_' : ""), 
 							'(', template, '),"'].join("");
 					}), '"'].join("").replace(/^"",|,""$/g, "");
-				if (expression)	
+				if (expression)
 					return ['_output_.push(', expression, ');'].join("");
 				else return "";
 			}));
