@@ -38,7 +38,9 @@ void function(exports){
 		if (!editor) return;
 		editor.focus();
 		if (editor.document && editor.document.selection){
-			editor.document.selection.createRange().text = value;
+			var textRange = editor.document.selection.createRange();
+			textRange.text = value;
+			textRange.select();
 		} else if (/^n/.test(typeof editor.selectionStart)){
 			var str = editor.value,
 				start = editor.selectionStart,
