@@ -13,8 +13,8 @@
 </v:shape>
 		</script>
 		<script id="templateSVG" type="text/template">
-<svg style="overflow:hidden;" xmlns="http://www.w3.org/2000/svg" version="1.1">
-	<path fill="none" stroke="#666666" d="M#{startPos}L#{lineFrom},#{lineTo}" stroke-width="1" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+	<path fill="none" stroke="#666666" d="M#{startPos}L#{lineFrom},#{lineTo}"/>
 </svg>
 		</script>
 		<script>
@@ -29,13 +29,13 @@
 				if (document.all){
 					document.createStyleSheet().cssText = 'v\\:*{behavior:url(#default#VML);}';
 				}
-				var t = 1;
+				var t = 5;
 				setInterval(function(){
 					document.getElementById('panel').innerHTML = rander(data);
-					if (data.lineTo[1] >= 200) t = -1;
-					if (data.lineTo[1] <= 0) t = 1;
+					if (data.lineTo[1] >= 200) t = -5;
+					if (data.lineTo[1] <= 0) t = 5;
 					data.lineTo[1] += t;
-				}, 500);
+				}, 100);
 			}();
 		</script>
 	</body>
