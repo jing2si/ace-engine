@@ -1,4 +1,4 @@
-var AceEditor = /^o/.test(typeof exports) ? exports : AceEditor || {};
+var AceEditor = /^u/.test(typeof exports) ? AceEditor || {} : exports;
 void function(exports){
 	/**
 	 * Ace Engine Editor
@@ -17,8 +17,8 @@ void function(exports){
 		if (!editor) return;
 		var start = Math.min(range[0], range[1]),
 			end = Math.max(range[0], range[1]);
-		editor.focus();
 		if (editor.setSelectionRange){
+			editor.focus();
 			editor.setSelectionRange(start, end);
 		} else if (editor.createTextRange){
 			var textRange = editor.createTextRange();
@@ -37,11 +37,7 @@ void function(exports){
 	function setSelectText(editor, value){
 		if (!editor) return;
 		editor.focus();
-		if (editor.document && editor.document.selection){
-			var textRange = editor.document.selection.createRange();
-			textRange.text = value;
-			textRange.select();
-		} else if (/^n/.test(typeof editor.selectionStart)){
+		if ('selectionStart' in editor){
 			var str = editor.value,
 				start = editor.selectionStart,
 				scroll = editor.scrollTop;
@@ -50,6 +46,10 @@ void function(exports){
 			editor.selectionStart = start + value.length;
 			editor.selectionEnd = start + value.length;
 			editor.scrollTop = scroll;
+		} else if (editor.document && editor.document.selection){
+			var textRange = editor.document.selection.createRange();
+			textRange.text = value;
+			textRange.select();
 		}
 	}
 	
@@ -59,7 +59,7 @@ void function(exports){
 
 	function _getSelectPos(editor, isend) {
 		if (!editor) return;
-		if (/^n/.test(typeof editor.selectionStart))
+		if ('selectionStart' in editor)
 			return isend ? editor.selectionEnd : editor.selectionStart;
 		if (!editor.createTextRange || !editor.document) return;
 		editor.focus();
@@ -92,11 +92,12 @@ void function(exports){
 	 */
 	function getSelectText(editor){
 		if (!editor) return;
-		editor.focus();
-		if (editor.document && editor.document.selection)
-			return editor.document.selection.createRange().text;
-		else if ("selectionStart" in editor)
+		if ("selectionStart" in editor)
 			return editor.value.substring(editor.selectionStart, editor.selectionEnd);
+		if (editor.document && editor.document.selection){
+			editor.focus();
+			return editor.document.selection.createRange().text;
+		}
 	}
 
 	exports.setSelectRange = setSelectRange;
