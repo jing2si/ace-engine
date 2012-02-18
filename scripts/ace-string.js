@@ -1,4 +1,4 @@
-var AceString = typeof exports != 'undefined' ? exports : AceString || {};
+var AceString = /^u/.test(typeof exports) ? AceString || {} : exports;
 void function(exports)  {
 	/**
 	 * Ace Engine String
@@ -8,13 +8,16 @@ void function(exports)  {
 	 * @version 1.0
 	 * @copyright www.baidu.com
 	 */
-	var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	var b64;
 	/**
 	 * 对字符串进行base64编码
 	 * param{string} str 原始字符串
 	 */
 	function encodeBase64(str) {
 		if (!str) return;
+		if (!b64){
+			b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+		}
 		var inputs = {}, outputs = {}, bits, i = 0, result = [];
 		str = encodeUTF8(str);
 		do {
@@ -114,6 +117,100 @@ void function(exports)  {
 		);
 		return str;
 	}
+	
+	/**
+	 * 格式化函数
+	 * @param {String} template 模板
+	 * @param {Object} json 数据项
+	 */
+	function format(template, json){
+		return template.replace(/#\{(.*?)\}/g, function(all, key){
+			return json && (key in json) ? json[key] : "";
+		});
+	}
+	/*
+	 * html编码转换字典
+	 */
+	var htmlDecodeDict, htmlEncodeDict;
+	/**
+	 * HTML解码
+	 * @param {String} html
+	 */
+	function decodeHTML(html){
+		htmlDecodeDict || (htmlDecodeDict = {
+			'quot': '"',
+			'lt': '<',
+			'gt': '>',
+			'amp': '&',
+			'nbsp': ' '
+		});
+		return String(html).replace(
+			/&((quot|lt|gt|amp|nbsp)|#x([a-f\d]+)|#(\d+));/ig, 
+			function(all, group, key, hex, dec){
+				return key ? htmlDecodeDict[key.toLowerCase()] :
+					hex ? String.fromCharCode(parseInt(hex, 16)) : 
+					String.fromCharCode(+dec);
+			}
+		);
+	}
+	
+	/**
+	 * HTML编码
+	 * @param {String} text 
+	 */
+	function encodeHTML(text){
+		htmlEncodeDict || (htmlEncodeDict = {
+			'"': 'quot',
+			'<': 'lt',
+			'>': 'gt',
+			'&': 'amp',
+			' ': 'nbsp'
+		});
+		return String(text).replace(/["<>& ]/g, function(all){
+			return "&" + htmlEncodeDict[all] + ";";
+		});
+	}
+
+	/*
+	function decodeHTML(html){
+		var pre = document.createElement('pre');
+		pre.innerHTML = html.replace(/[\\<>]/g, function(all){
+			return '\\' + all.charCodeAt() + ';';
+		});
+		return String(pre.innerText || pre.textContent).replace(/\\(\d+);/g, function(all, dec){
+			return String.fromCharCode(+dec);
+		});
+	}
+	
+	function encodeHTML(text){
+		var pre = document.createElement('pre');
+		pre.appendChild(document.createTextNode(text));
+		return pre.innerHTML;
+	}
+	*/
+
+	var crc32dict;
+	function crc32(str){
+		var i, j, k;
+		if (!crc32dict){
+			crc32dict = [];
+			for (i = 0; i < 256; i++) {
+				k = i;
+				for (j = 8; j--;)
+					if (k & 1) 
+						k = (k >>> 1) ^ 0xedb88320;
+					else k >>>= 1;
+				crc32dict[i] = k;
+			}
+		}
+		
+		str = encodeUTF8(str);
+		k = -1;
+		for (i = 0; i < str.length; i++) {
+			k = (k >>> 8) ^ crc32dict[(k & 0xff) ^ str.charCodeAt(i)];
+		}
+		return -1 ^ k;
+	}
 
 	exports.base64 = {
 		encode: encodeBase64,
@@ -123,8 +220,17 @@ void function(exports)  {
 		encode: encodeUTF8,
 		decode: decodeUTF8
 	};
+	
+	exports.format = format;
+	exports.html = {
+		encode: encodeHTML,
+		decode: decodeHTML
+	};
+	
+	exports.crc32 = crc32;
 }(AceString);
 
 /*
 console.log(AceString.base64.decode(AceString.base64.encode('english 中文')));
+console.log(AceString.html.decode("&amp;#34;&#x4F60;&#x3c;"));
 //*/
