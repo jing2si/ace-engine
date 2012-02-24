@@ -21,8 +21,9 @@
 		function g(id){
 			return document.getElementById(id);
 		}
+
 		void function(){
-			g('editor').onkeyup = function(e){
+			g('editor').onmouseup = g('editor').onkeyup = function(e){
 				g('txtSelectText').value = AceEditor.getSelectText(this).replace(/\n/g, " ");
 				g('txtSelectStart').value = AceEditor.getSelectStart(this);
 				g('txtSelectEnd').value = AceEditor.getSelectEnd(this);

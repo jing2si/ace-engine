@@ -1,9 +1,8 @@
-var AceCore = typeof exports == "undefined" ? AceCore || {} : exports;
-
+var AceCore = /^u/.test(typeof exports) ? AceCore || {} : exports;
 void function(exports){
 
 	/**
-	 * @author 王集鹄(wangjihu，http://weibo.com/zswang) 李学健(lixuejian，http://weibo.com/poppyrr)
+	 * @author 王集鹄(wangjihu,http://weibo.com/zswang) 李学健(lixuejian,http://weibo.com/poppyrr)
 	 * @fileoverview 内核 注册模块、事件管理、类库引用
 	 * @version 1.0.2
 	 * @copyright www.baidu.com
@@ -11,53 +10,52 @@ void function(exports){
 	/**
 	 * 监听事件集合
 	 */
-	var listeners = {};
+	var listeners = {},
 	/**
 	 * 配置项
 	 */
-	var configs = {};
+		configs = {},
 	/**
 	 * 程序是否启动
 	 */
-	var active = false;
+		active,
 	/**
 	 * 事件缓存
 	 */
-	var eventCaches = [];
+		eventCaches = [],
 	/**
 	 * 类库
 	 */
-	var lib = {
-		/**
-		 * 格式化函数
-		 * @param {String} template 模板
-		 * @param {Object} json 数据项
-		 */
-		format: function(template, json){
-			return template.replace(/#\{(.*?)\}/g, function(all, key){
-				return json && (key in json) ? json[key] : "";
-			});
-		}
-	};
-	
+		lib = {
+			/**
+			 * 格式化函数
+			 * @param {String} template 模板
+			 * @param {Object} json 数据项
+			 */
+			format: function(template, json){
+				return template.replace(/#\{(.*?)\}/g, function(all, key){
+					return json && (key in json) ? json[key] : "";
+				});
+			}
+		},
 	/**
 	 * 模块集合
 	 */
-	var modules = {};
+		modules = {},
 	
 	/**
 	 * 扩展集合
 	 */
-	var extensions = {};
+		extensions = {},
 	
 	/**
 	 * 日志记录
 	 */
-	var logger = {
-		log: function(message){
-			typeof console == "object" && console.log(message);
-		}
-	};
+		logger = {
+			log: function(message){
+				/^o/.test(typeof console) && console.log(message);
+			}
+		};
 	
 	/**
 	 * 注册监听
@@ -120,11 +118,7 @@ void function(exports){
 		if (!listener) return;
 		var i = listener.length;
 		while (i--) {
-			try {
-				listener[i](data, event);
-			} catch(ex) {
-				logger.log([event, ex.message].join(" : "));
-			}
+			listener[i](data, event);
 		}
 	}
 	
@@ -169,7 +163,7 @@ void function(exports){
 				}
 			}(id)
 		});
-		if (module.instance.init) module.instance.init();
+		if (module.instance && module.instance.init) module.instance.init();
 	}
 	
 	/**
