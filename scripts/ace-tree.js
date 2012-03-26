@@ -66,6 +66,8 @@ void function(exports){
 		}
 	};
 	
+	var ie = /*@cc_on!@*/0;
+	
 	/**
 	 * 检查是否包含关系,包括是否相同
 	 * @param {Element|String} element
@@ -484,7 +486,15 @@ void function(exports){
 	 */
 	TemplateNode.prototype.refresh = function(){
 		if (this == this.tree) {
-			this.parent.innerHTML = TemplateNode.prototype.reader.call(this);
+			if (ie && /^(col|colgroup|frameset|table|tbody|tfoot|thead|title|tr)$/i.test(this.parent.tagName)){
+				for (var i = this.parent.childNodes.length - 1; i >= 0; i--){
+					if (/^(tr|th)$/i.test(this.parent.childNodes[i].tagName))
+						this.parent.removeChild(this.parent.childNodes[i]);
+				}
+				this.parent.appendChild(html2Fragment(TemplateNode.prototype.reader.call(this)));
+			} else {
+				this.parent.innerHTML = TemplateNode.prototype.reader.call(this);
+			}
 			return;
 		}
 		!isAncestor(this.did, this.cid) && lib.remove(this.cid); // 如果子节点容器是嵌套形式出现
