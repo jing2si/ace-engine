@@ -1,5 +1,5 @@
 var AceString = /^u/.test(typeof exports) ? AceString || {} : exports;
-void function(exports)  {
+void function(exports){
 	/**
 	 * Ace Engine String
 	 * 字符串编码处理
