@@ -33,11 +33,53 @@ void function(exports){
 	}
 	
 	function projection(xy, z, xyOffset, zOffset, distance){
-		return ((distance * xy) / (z - zOffset)) + xyOffset;
+		return (distance * xy) / (z - zOffset) + xyOffset;
+	}
+
+	/*
+	 * 贝赛尔曲线
+	 * @param{Array[Array[Number, Number, Number],...]} curve 曲线每个参考点
+	 * @param{Number} rate 比率
+	 */
+	function bezier(curve, rate){
+		if (!curve || !curve.length) return [];
+		if (curve.length == 1) return [curve[0][0], curve[0][1], curve[0][2]];
+		if (curve.length == 2) return [
+			curve[0][0] + (curve[1][0] - curve[0][0]) * rate,
+			curve[0][1] + (curve[1][1] - curve[0][1]) * rate,
+			curve[0][2] + (curve[1][2] - curve[0][2]) * rate
+		];
+		var temp = [];
+		for (var i = 1; i < curve.length; i++){
+			temp.push(bezier([curve[i - 1], curve[i]], rate));
+		}
+		return bezier(temp, rate);
+	}
+	
+	/*
+	 * 将一条曲线剪成两段
+	 * @param{Array[Array[Number, Number, Number],...]} curve 曲线每个参考点
+	 * @param{Number} rate 比率
+	 */
+	function cutBezier(curve, rate){
+		if (!curve || curve.length < 2) return;
+		var pa = curve[0], pb = curve[curve.length - 1],
+			ta = [], tb = [],
+			ra = [], rb = [];
+		for (var i = 0; i < curve.length; i++){
+			ta.push(curve[i]);
+			ra.push(bezier(ta, rate));
+
+			tb.unshift(curve[curve.length - i - 1]);
+			rb.unshift(bezier(tb, rate));
+		}
+		return [ra, rb];
 	}
 
 	exports.rotateX = rotateX;
 	exports.rotateY = rotateY;
 	exports.rotateZ = rotateZ;
 	exports.projection = projection;
+	exports.bezier = bezier;
+	exports.cutBezier = cutBezier;
 }(Ace3D);
