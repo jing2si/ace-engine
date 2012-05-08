@@ -662,10 +662,10 @@ void function(exports){
 		if (/^f/.test(typeof depth)){
 			var oldSort = this.onsort;
 			this.onsort = depth;
-			TemplateNode.prototype.sort.call(this, true, depth || /^u/.test(typeof depth));
+			TemplateNode.prototype.sort.call(this, true, false);
 			this.onsort = oldSort;
 		} else {
-			TemplateNode.prototype.sort.call(this, true, depth || /^u/.test(typeof depth));
+			TemplateNode.prototype.sort.call(this, depth || /^u/.test(typeof depth), false);
 		}
 	};
 	
