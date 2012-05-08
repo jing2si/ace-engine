@@ -659,7 +659,14 @@ void function(exports){
 	 * @param {Boolean} depth 是否深度更新，默认为true
 	 */
 	TemplateTree.prototype.sort = function(depth){
-		TemplateNode.prototype.sort.call(this, true, depth || typeof depth == "undefiend");
+		if (/^f/.test(typeof depth)){
+			var oldSort = this.onsort;
+			this.onsort = depth;
+			TemplateNode.prototype.sort.call(this, true, depth || /^u/.test(typeof depth));
+			this.onsort = oldSort;
+		} else {
+			TemplateNode.prototype.sort.call(this, true, depth || /^u/.test(typeof depth));
+		}
 	};
 	
 	/**
