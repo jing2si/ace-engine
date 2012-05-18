@@ -38,7 +38,7 @@ var http = {
 				callback(eval(xmlhttp.responseText));
 			}
 		}
-		xmlhttp.open('GET');
+		xmlhttp.open('GET', url, true);
 		xmlhttp.send(null);
 	}
 }
