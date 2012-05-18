@@ -114,7 +114,7 @@ void function(){
 						// 正在加载或加载中
 						break;
 					}
-					node.setStatus('loading', false);
+					node.setStatus('loading', true);
 					http.get(node.data.source, function(data){
 						setTimeout(function(){
 							node.setStatus('loading', false, true); // 最后一个参数指定不刷新
