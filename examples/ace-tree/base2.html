@@ -116,9 +116,11 @@ void function(){
 					}
 					node.setStatus('loading', false);
 					http.get(node.data.source, function(data){
-						node.setStatus('loading', false, true); // 最后一个参数指定不刷新
-						node.setStatus('loaded', true);
-						node.loadChilds(data);
+						setTimeout(function(){
+							node.setStatus('loading', false, true); // 最后一个参数指定不刷新
+							node.setStatus('loaded', true);
+							node.loadChilds(data);
+						}, 3000);
 					});
 					break;
 			}
