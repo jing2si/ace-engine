@@ -112,6 +112,17 @@ void function(exports){
 	}
 	
 	/**
+	 * 插入当前DOM对象的HTML
+	 * @param {Element|String} element
+	 * @param {String} html
+	 */
+	function insertWith(element, html){
+		element = lib.g(element);
+		if (!element) return;
+		element.insertBefore(html2Fragment(html), element.firstChild);
+	}
+	
+	/**
 	 * 添加一个属性值
 	 * @param {Element|String} element
 	 * @param {String} attrName
@@ -214,6 +225,8 @@ void function(exports){
 	 */
 	var handler = 0;
 	
+	var guid = 0;
+	
 	/**
 	 * 节点类
 	 * @param {Node} parentNode 父节点
@@ -236,6 +249,9 @@ void function(exports){
 		 * id
 		 */
 		this.id = data[this.tree.fieldIdentifier];
+		if (/^u/.test(this.id)) { // 默认加一个id
+			this.id = '_guid_' + (guid++);
+		}
 		/*
 		 * DOM id
 		 */
@@ -297,6 +313,27 @@ void function(exports){
 		return node;
 	};
 	
+	/**
+	 * 添加子节点
+	 * @param {Object} data 数据
+	 * @param {Boolean} depth 是否深度添加，默认为true
+	 */
+	TemplateNode.prototype.insertChild = function(data, depth){
+		if (this.tree.onsort) { // 启动排序的情况走 appendChild
+			return this.appendChild(data, depth);
+		}
+		if (!data) return;
+		if (typeof depth == "undefined") depth = true;
+		var node = new TemplateNode(this, data);
+		this.childNodes.unshift(node);
+		for (var i = 0; i < this.childNodes.length; i++) { // 更新序号
+			this.childNodes[i].index = i;
+		}
+		if (depth) node.loadChilds(data[this.tree.fieldChilds], true);
+		insertWith(this.cid, node.reader());
+		return node;
+	};
+
 	/**
 	 * 批量添加子节点
 	 * @param {Array} datas 数据列表
@@ -387,7 +424,6 @@ void function(exports){
 		var self = this;
 		return this.tree.onreader(this).replace(/(^\s*<\w+)([^>]*>)([\s\S]*$)/, function(all, $1, $2, $3){
 			$3 = $3.replace(/(<\w+\b[^>]*)(\bdata-type="childs"[^>]*>)(\s*<\/\w+>)/, function(all, $1, $2, $3){
-				if (!childLines.length) return "";
 				return [$1, ' id="', self.cid, '"', $2, childLines.join(""), $3].join("");
 			});
 			return [$1, ' id="', self.did, '"', $2, $3].join("");
@@ -624,6 +660,15 @@ void function(exports){
 		this.refresh();
 	};
 	
+	/**
+	 * 插入子节点(往第一个位置添加)
+	 * @param {Object} data 数据
+	 * @param {Boolean} depth 是否深度添加，默认为true
+	 */
+	TemplateTree.prototype.insertChild = function(data, depth){
+		return TemplateNode.prototype.insertChild.call(this, data, depth);
+	};
+
 	/**
 	 * 添加子节点
 	 * @param {Object} data 数据

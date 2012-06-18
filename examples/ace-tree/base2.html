@@ -91,7 +91,7 @@ void function(){
 		},
 		oncommand: function(command, node){ // 接受容器事件
 			switch(command){
-				case 'remove': // 收到移除命名 // 由cmd="remove"指定
+				case 'remove': // 收到移除命令 // 由cmd="remove"指定
 					node.remove();
 					break;
 				case 'edit':
@@ -118,7 +118,7 @@ void function(){
 					http.get(node.data.source, function(data){
 						setTimeout(function(){
 							node.setStatus('loading', false, true); // 最后一个参数指定不刷新
-							node.setStatus('loaded', true);
+							node.setStatus('loaded', true, true);
 							node.loadChilds(data);
 						}, 3000);
 					});
@@ -128,6 +128,11 @@ void function(){
 	});
 	
 	addressTemplate.loadChilds(address);
+	addressTemplate.each(function(node){
+		if (node.data.text == '3东城区'){
+			console.log(node.data);
+		}
+	});
 }();
 		</script>
 	</body>
