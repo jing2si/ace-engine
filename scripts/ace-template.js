@@ -92,19 +92,6 @@ void function(exports){
 				return id;
 			return document.getElementById(id);
 		},
-		/**
-		 * HTML解码
-		 * @param {String} html
-		 */
-		decodeHTML: function(html) {
-			return String(html).replace(/&(quot|lt|gt|amp|nbsp);/ig, function(all, key) {
-				return htmlDecodeDict[key];
-			}).replace(/&#u([a-f\d]{4});/ig, function(all, hex) {
-				return String.fromCharCode(parseInt("0x" + hex));
-			}).replace(/&#(\d+);/ig, function(all, number) {
-				return String.fromCharCode(+number);
-			});
-		},
 		
 		/**
 		 * HTML编码
@@ -115,6 +102,7 @@ void function(exports){
 				return "&" + htmlEncodeDict[all] + ";";
 			});
 		},
+		
 		/**
 		 * 获得元素文本
 		 * @param {Element} element
@@ -123,7 +111,7 @@ void function(exports){
 			if (!element || !element.tagName) return "";
 			if (/^(input|textarea)$/i.test(element.tagName))
 				return element.value;
-			return lib.decodeHTML(element.innerHTML);
+			return element.innerHTML;
 		}
 	};
 	
