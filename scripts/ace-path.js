@@ -15,7 +15,7 @@ void function(exports){
          * 是否ie9+
          */
         ie9plus = ie && window.XMLHttpRequest && window.addEventListener, 
-        
+        svg = !ie || ie9plus,
         vmlStyle;
     
     /**
@@ -36,10 +36,10 @@ void function(exports){
             this.parent = options.parent || document.body;
         }
         this.fill = options.fill || 'none';
-        this.stroke = options.stroke || 'red';
-        this.path = options.path || '';
+        this.stroke = options.stroke || 'black';
+        this.path = options.path || 'M 0,0';
         var div = document.createElement('div');
-        if (!ie || ie9plus){
+        if (svg){
             div.innerHTML = format('\
 <svg width=100% height=100% xmlns="http://www.w3.org/2000/svg">\
     <path fill="#{fill}" stroke="#{stroke}" stroke-width="1" d="#{path}"/>\
@@ -58,22 +58,74 @@ void function(exports){
             this.element = div;
             div.className = 'ace_path_panel';
             this.elementPath = div.lastChild;
+            this.elementFill = this.elementPath.getElementsByTagName('fill')[0];
+            this.elementStroke = this.elementPath.getElementsByTagName('stroke')[0];
             this.parent.appendChild(this.element);
         }
     }
-    
-    Path.prototype.attr = function(value){
-        
-    
-        if (path == this.path) return;
-        
-        this.path = path;
-        if (!ie || ie9plus){
-            this.elementPath.setAttribute('d', path);
-        } else {
-            this.elementPath.path = path;
+    /*
+     * 设置或获取属性
+     * @param {Object} values
+     * @or
+     * @param {String} name
+     * @param {String} value
+     * @or
+     * @param {String} name
+     */
+    Path.prototype.attr = function(name, value){
+        if (arguments.length == 1){
+            if (typeof name == 'string'){
+                return this[name];
+            }
+            if (typeof name == 'object'){
+                for (var p in name){
+                    this.attr(p, name[p]);
+                }
+                return this;
+            }
+        } else if (arguments.length > 1){
+            switch(name){
+                case 'path':
+                    if (this.path == value) break;
+                    this.path = value;
+                    if (svg){
+                        this.elementPath.setAttribute('d', value || 'M 0,0');
+                    } else {
+                        this.elementPath.path = value || 'M 0,0';
+                    }
+                    break;
+                case 'fill':
+                    if (this.fill == value) break;
+                    this.fill = value;
+                    if (svg){
+                        this.elementPath.setAttribute('fill', value);
+                    } else {
+                        if (value == 'none'){
+                            this.elementPath.Filled = 'f';
+                        } else {
+                            this.elementPath.Filled = 't';
+                        }
+                        this.elementFill.Color = value;
+                    }
+                    break;
+                case 'stroke':
+                    if (this.stroke == value) break;
+                    this.stroke = value;
+                    if (svg){
+                        this.elementPath.setAttribute('stroke', value);
+                    } else {
+                        if (value == 'none'){
+                            this.elementPath.Stroked = 'f';
+                        } else {
+                            this.elementPath.Stroked = 't';
+                        }
+                        this.elementStroke.Color = value;
+                    }
+                    break;
+            }
+            return this;
         }
-        return set;
+        
     };
 
     function create(options){
@@ -84,8 +136,8 @@ void function(exports){
         vmlStyle = document.createStyleSheet();
         vmlStyle.cssText = '\
 .ace_path_shape,.ace_path_shape*{behavior:url(#default#VML);}\
-.ace_path_shape{width:1px;height:1px;padding:0;margin:0;}\
-.ace_path_panel{width:100%;height: 100%;overflow: hidden;padding:0;margin:0;}\
+.ace_path_shape{width:1px;height:1px;padding:0;margin:0;left:0;top:0;position:absolute;}\
+.ace_path_panel{width:100%;height:100%;overflow:hidden;padding:0;margin:0;position:relative;}\
 ';
     }
     
