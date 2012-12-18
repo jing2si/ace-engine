@@ -31,7 +31,7 @@ void function(){
     AceEvent.on('toolbar', function(command){
         switch(command){
             case 'set':
-                path.set(document.getElementById('path').value);
+                path.attr('path', document.getElementById('path').value);
                 break;
         }
     });

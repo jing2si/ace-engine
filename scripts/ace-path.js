@@ -55,13 +55,16 @@ void function(exports){
     <v:stroke color=#{stroke} weight=1></v:stroke>\
     <v:fill></v:fill>\
 </v:shape>', this);
-            this.element = div.lastChild;
+            this.element = div;
+            div.className = 'ace_path_panel';
             this.elementPath = div.lastChild;
             this.parent.appendChild(this.element);
         }
     }
     
-    Path.prototype.set = function(path){
+    Path.prototype.attr = function(value){
+        
+    
         if (path == this.path) return;
         
         this.path = path;
@@ -70,6 +73,7 @@ void function(exports){
         } else {
             this.elementPath.path = path;
         }
+        return set;
     };
 
     function create(options){
@@ -81,6 +85,7 @@ void function(exports){
         vmlStyle.cssText = '\
 .ace_path_shape,.ace_path_shape*{behavior:url(#default#VML);}\
 .ace_path_shape{width:1px;height:1px;padding:0;margin:0;}\
+.ace_path_panel{width:100%;height: 100%;overflow: hidden;padding:0;margin:0;}\
 ';
     }
     
