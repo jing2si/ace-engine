@@ -3,25 +3,25 @@ var AcePath = AcePath || {};
 void function(exports){
     /**
      * Ace Engine Path
-     * Ò»Ì×Õ¹Ê¾Ê¸Á¿Í¼Â·¾¶µÄ¿Ø¼ş
+     * ä¸€å¥—å±•ç¤ºçŸ¢é‡å›¾è·¯å¾„çš„æ§ä»¶
      * @see http://code.google.com/p/ace-engine/wiki/AcePath
-     * @author Íõ¼¯ğÀ(wangjihu,http://weibo.com/zswang)
+     * @author ç‹é›†é¹„(wangjihu,http://weibo.com/zswang)
      * @version 1.0
      * @copyright www.baidu.com
      */
     var 
         ie = document.all && window.attachEvent,
         /*
-         * ÊÇ·ñie9+
+         * æ˜¯å¦ie9+
          */
         ie9plus = ie && window.XMLHttpRequest && window.addEventListener, 
         svg = !ie || ie9plus,
         vmlStyle;
     
     /**
-     * ¸ñÊ½»¯º¯Êı
-     * @param {String} template Ä£°å
-     * @param {Object} json Êı¾İÏî
+     * æ ¼å¼åŒ–å‡½æ•°
+     * @param {String} template æ¨¡æ¿
+     * @param {Object} json æ•°æ®é¡¹
      */
     function format(template, json){
         return template.replace(/#\{(.*?)\}/g, function(all, key){
@@ -64,7 +64,7 @@ void function(exports){
         }
     }
     /*
-     * ÉèÖÃ»ò»ñÈ¡ÊôĞÔ
+     * è®¾ç½®æˆ–è·å–å±æ€§
      * @param {Object} values
      * @or
      * @param {String} name
